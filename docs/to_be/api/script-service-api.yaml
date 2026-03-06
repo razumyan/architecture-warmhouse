@@ -1,0 +1,226 @@
+swagger: '2.0'
+info:
+  title: SmartHome Script Service API
+  version: 1.0.0
+paths:
+  /scripts:
+    get:
+      tags:
+        - scripts management
+      summary: Gets all scripts by filter
+      parameters:
+        - in: query
+          name: customer_id
+          type: number
+          description: filter value by the owning customer id
+      responses:
+        200:
+          description: The list of the scripts
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Script"
+    post:
+      tags:
+        - scripts management
+      summary: Creates a new script
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              customer_id:
+                type: number
+                description: The owning customer id
+              name:
+                type: string
+                description: The name of the script
+              lang:
+                type: string
+                description: The language of the script
+              type:
+                type: string
+                description: The type of the script
+              content:
+                type: string
+                description: The content of the script
+              parameters:
+                type: array
+                description: The parameters for the script
+                items:
+                  $ref: "#/definitions/ScriptParam"
+              cron:
+                type: string
+                description: The cron for scheduled script type
+            example:
+              customer_id: 10
+              name: "Switch lamp"
+              lang: "LUA"
+              type: "TRIGGER"
+              parameters:
+                - name: "MOTION_SENSOR"
+                  type: "TriggeringDevice"
+                  value: "13"
+                - name: "LAMP"
+                  type: "Device"
+                  value: "12"
+                - name: "LIMIT"
+                  type: "Float"
+                  value: "0.6"
+              content: |
+                local value = devices.get_value(MOTION_SENSOR)
+                if value > LIMIT then
+                  devices.send_command(LAMP, "SWITCH_ON")
+                else
+                  devices.send_command(LAMP, "SWITCH_OFF")
+                end
+      responses:
+        201:
+          description: Script created successfully
+          schema:
+            $ref: "#/definitions/Script"
+        400:
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/InputError"
+  /scripts/{script_id}:
+    get:
+      tags:
+        - scripts management
+      summary: Gets the script by its id
+      parameters:
+        - in: path
+          name: script_id
+          required: true
+          type: number
+      responses:
+        200:
+          description: The full information about the script
+          schema:
+            $ref: "#/definitions/ScriptDetails"
+        404:
+          description: Script not found
+
+    patch:
+      tags:
+        - scripts management
+      summary: Updates the script
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: script_id
+          required: true
+          type: number
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              customer_id:
+                type: number
+                description: The id ot the script owner
+              name:
+                type: string
+                description: The name of the script
+              content:
+                type: string
+                description: The content of the script
+              parameters:
+                type: array
+                description: The parameters for the script
+                items:
+                  $ref: "#/definitions/ScriptParam"
+              cron:
+                type: string
+                description: The cron for scheduled script type
+            example:
+              cron: "30 7-23 * * *"
+      responses:
+        200:
+          description: Script updated successfully
+          schema:
+            $ref: "#/definitions/Script"
+        404:
+          description: Script not found
+    delete:
+      tags:
+        - scripts management
+      summary: Deletes the script
+      parameters:
+        - in: path
+          name: script_id
+          required: true
+          type: number
+      responses:
+        200:
+          description: The script was deleted successfully
+definitions:
+  Script:
+    type: object
+    properties:
+      id:
+        type: number
+        description: The id of the script
+      customer_id:
+        type: number
+        description: The id of the owning customer
+      name:
+        type: string
+        description: The name of the script
+      lang:
+        type: string
+        description: The language of the script
+      type:
+        type: string
+        description: The type of the script
+      cron:
+        type: string
+        description: The cron for scheduled script type
+  ScriptParam:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The name of the parameter
+      type:
+        type: string
+        description: The type of the parameter
+      value:
+        type: string
+        description: The value of the parameter
+  ScriptDetails:
+    type: object
+    allOf:
+      - $ref: "#/definitions/Script"
+    properties:
+      content:
+        type: string
+        description: The content of the script
+      parameters:
+        type: array
+        description: The parameters for the script
+        items:
+          $ref: "#/definitions/ScriptParam"
+  InputError:
+    type: object
+    properties:
+      details:
+        type: array
+        items:
+          type: object
+          properties:
+            field:
+              type: string
+              description: The invalid field name
+            error:
+              type: string
+              description: The error description
+            value:
+              type: string
+              description: The input value

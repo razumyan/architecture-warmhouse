@@ -1,0 +1,18 @@
+@startuml
+
+title Диаграмма комопнента Smart Home Applicaiton
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Component_Ext(CustomerWebApp, "Customer WEB Application", "ReactJS", "Позволяет клиенту управлять устройствами в доме")
+
+Component(SmartHomeApp, "Smart Home Application", "GoLang", "Обрабатывает и маршрутизирует запросы клиентов")
+
+Component_Ext(CustomerDeviceService, "Customer Device Service", "GoLang", "Управляет устройствами")
+Component_Ext(ScriptService, "Script Service", "GoLang", "Управляет сценариями клиентов")
+
+Rel_D(SmartHomeApp, ScriptService, "Управление скриптами клиентов", "gRPC")
+Rel_R(CustomerWebApp, SmartHomeApp, "Создание скриптов\nУправления устройствами", "REST API, HTTPs")
+BiRel_R(SmartHomeApp, CustomerDeviceService, "Управление устройствами клиента, телеметрия", "gRPC")
+
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+
+title Диаграмма комопнента Customer WEB Application
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(customer, "Customer", "Клиент системы Smart Home")
+
+Component(CustomerWebApp, "Customer WEB Application", "ReactJS", "Позволяет клиенту управлять устройствами в доме")
+
+Component_Ext(CustomerPortal, "Customer Portal", "Liferay", "Аутентификация")
+Component_Ext(SmartHomeService, "Smart Home Service", "GoLang", "Обрабатывает и маршрутизирует запросы клиентов")
+Component_Ext(SmartHomeDevice, "Smart Home Device", "Any Compatible", "Устройство поддерживающее протокол системы Smart Home")
+
+Rel_L(CustomerWebApp, SmartHomeDevice, "Привязка устройства", "QRCode")
+Rel_D(CustomerWebApp, SmartHomeService, "Управление устройствами, создание сценариев", "REST API/HTTPs")
+Rel_D(customer, CustomerWebApp, "Управление устройствами дома\n\nСоздание сценариев")
+Rel_R(CustomerWebApp, CustomerPortal, "Аутентификация", "OAuth2")
+
+@enduml

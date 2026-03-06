@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mkdocs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smarthome-mkdocs
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./docs:/docs
+      - ./site:/site
+      - ./mkdocs.yml:/mkdocs.yml

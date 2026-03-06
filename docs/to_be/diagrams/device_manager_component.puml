@@ -1,0 +1,32 @@
+@startuml
+
+title Диаграмма комопнента Customer Device Manager
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Boundary(CustomerDeviceManager, "Customer Device Manager", $type="microservice") {
+  Component(CustomerDeviceApp, "Customer Device Application", "GoLang", "Управляет подключением устройств")
+  ComponentDb(DeviceDatabase, "Device DB", "PostgreSQL", "Хранит состояние устройств подключенных к системе")
+  ComponentQueue(CustomerTelemetryQueue, "Customer Telemetry Queue", "RabbitMQ", "Сбор телеметрии, рассылка сообщений устройствам")
+}
+
+Component_Ext(SmartHomeService, "Smart Home Serivce", "GoLang", "Обрабатывает и маршрутизирует запросы клиентов")
+Component_Ext(ScriptService, "Script Serivce", "GoLang", "Управляет устройствами по сценариям клиента")
+
+Boundary(CustomerHome, "Customer Home") {
+  Component_Ext(SmartHomeDevice, "Smart Home Device", "Any Compatible", "Устройство поддерживающее протокол системы Smart Home")
+}
+
+Lay_D(SmartHomeDevice, ScriptService)
+
+Lay_L(CustomerTelemetryQueue, SmartHomeDevice)
+Lay_R(CustomerDeviceManager, SmartHomeService)
+
+Rel(CustomerDeviceApp, DeviceDatabase, "Запись/Чтение сотояния устройств", "SQL/TCP")
+BiRel(CustomerTelemetryQueue, CustomerDeviceApp, "Управление устройствами\nСтатусы устройств", "AMQP")
+BiRel_R(SmartHomeDevice, CustomerTelemetryQueue, "Телеметрия\nУправляющие сигналы", "MQTTs/HTTPs")
+Rel_L(SmartHomeService, CustomerDeviceApp, "Управляющие команды\nРегистрация устройств", "gRPC")
+Rel_R(ScriptService, CustomerDeviceApp, "Управляющие команды", "gRPC")
+Rel(CustomerTelemetryQueue, ScriptService, "Телеметрия", "AMQP")
+
+@enduml

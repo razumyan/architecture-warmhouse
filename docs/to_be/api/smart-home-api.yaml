@@ -1,0 +1,366 @@
+swagger: '2.0'
+info:
+  title: SmartHome Service API
+  version: 1.0.0
+paths:
+  /customer/scripts:
+    get:
+      tags:
+        - scripts management
+      summary: Gets all customer's scripts
+      responses:
+        200:
+          description: The list of the scripts
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/CustomerScript"
+    post:
+      tags:
+        - scripts management
+      summary: Creates a new script
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the script
+              lang:
+                type: string
+                description: The language of the script
+              type:
+                type: string
+                description: The type of the script
+              content:
+                type: string
+                description: The content of the script
+              parameters:
+                type: array
+                description: The parameters for the script
+                items:
+                  $ref: "#/definitions/CustomerScriptParam"
+              cron:
+                type: string
+                description: The cron for scheduled script type
+            example:
+              name: "Switch lamp"
+              lang: "LUA"
+              type: "TRIGGER"
+              parameters:
+                - name: "MOTION_SENSOR"
+                  type: "TriggeringDevice"
+                  value: "12"
+                - name: "LAMP"
+                  type: "Device"
+                  value: "13"
+                - name: "LIMIT"
+                  type: "Float"
+                  value: "0.6"
+              content: |
+                local value = devices.get_value(MOTION_SENSOR)
+                if value > LIMIT then
+                  devices.send_command(LAMP, "SWITCH_ON")
+                else
+                  devices.send_command(LAMP, "SWITCH_OFF")
+                end
+      responses:
+        201:
+          description: CustomerScript created successfully
+          schema:
+            $ref: "#/definitions/CustomerScript"
+        400:
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/InputError"
+  /customer/scripts/{script_id}:
+    get:
+      tags:
+        - scripts management
+      summary: Gets the script by its id
+      parameters:
+        - in: path
+          name: script_id
+          required: true
+          type: number
+      responses:
+        200:
+          description: The full information about the script
+          schema:
+            $ref: "#/definitions/CustomerScriptDetails"
+    patch:
+      tags:
+        - scripts management
+      summary: Updates the script
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: script_id
+          required: true
+          type: number
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the script
+              content:
+                type: string
+                description: The content of the script
+              parameters:
+                type: array
+                description: The parameters for the script
+                items:
+                  $ref: "#/definitions/CustomerScriptParam"
+              cron:
+                type: string
+                description: The cron for scheduled script type
+          example:
+            cron: "30 7-23 * * *"
+      responses:
+        200:
+          description: CustomerScript updated successfully
+          schema:
+            $ref: "#/definitions/CustomerScript"
+        400:
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/InputError"
+    delete:
+      tags:
+        - scripts management
+      summary: Deletes the script
+      parameters:
+        - in: path
+          name: script_id
+          required: true
+          type: number
+      responses:
+        200:
+          description: The script was deleted successfully
+  /customer/devices:
+    get:
+      tags:
+        - devices management
+      summary: Gets all customer's devices
+      responses:
+        200:
+          description: The list of the devices
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/CustomerDevice"
+    post:
+      tags:
+        - devices management
+      summary: Registers a new device
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              manufactureId:
+                type: string
+                description: The unique manufacture ID of the device (QR code)
+              name:
+                type: string
+                description: The name of the device
+              location:
+                type: string
+                description: The location of the device
+      responses:
+        201:
+          description: CustomerDevice registered successfully
+          schema:
+            $ref: "#/definitions/CustomerDevice"
+        400:
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/InputError"
+  /customer/devices/{device_id}:
+    post:
+      tags:
+        - devices management
+      summary: Updates the device
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          type: number
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the device
+              location:
+                type: string
+                description: The location of the device
+      responses:
+        200:
+          description: CustomerDevice registered successfully
+          schema:
+            $ref: "#/definitions/CustomerDevice"
+        400:
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/InputError"
+    delete:
+      tags:
+        - devices management
+      summary: Unlink the device
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          type: number
+      responses:
+        200:
+          description: The device unlinked successfully
+  /customer/devices/{device_id}/command/{device_command}:
+    post:
+      tags:
+        - devices management
+      summary: Send the command to the device
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: device_id
+          required: true
+          type: number
+          description: The id of the device
+        - in: path
+          name: device_command
+          required: true
+          type: string
+          example: "SWITCH_LIGHT"
+          description: The name of the device's specific command
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            description: The parameters for the command
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the parameter
+                value:
+                  type: string
+                  description: The value of the parameter
+            example:
+              - name: "LIGHTNESS"
+                value: "13"
+              - name: "COLOR"
+                value: "#D6E3FA"
+      responses:
+        200:
+          description: CustomerDevice registered successfully
+          schema:
+            $ref: "#/definitions/CustomerDevice"
+definitions:
+  CustomerScript:
+    type: object
+    properties:
+      id:
+        type: number
+        description: The id of the script
+      name:
+        type: string
+        description: The name of the script
+      lang:
+        type: string
+        description: The language of the script
+      type:
+        type: string
+        description: The type of the script
+      cron:
+        type: string
+        description: The cron for scheduled script type
+  CustomerScriptParam:
+    type: object
+    properties:
+      name:
+        type: string
+        description: The name of the parameter
+      type:
+        type: string
+        description: The type of the parameter
+      value:
+        type: string
+        description: The value of the parameter
+  CustomerScriptDetails:
+    type: object
+    allOf:
+      - $ref: "#/definitions/CustomerScript"
+    properties:
+      content:
+        type: string
+        description: The content of the script
+      parameters:
+        type: array
+        description: The parameters for the script
+        items:
+          $ref: "#/definitions/CustomerScriptParam"
+  CustomerDevice:
+    type: object
+    properties:
+      id:
+        type: number
+        description: The id of the device
+      name:
+        type: string
+        description: The type of the device
+      location:
+        type: string
+        description: The location of the device
+      type:
+        type: string
+        description: The type of the device
+      status:
+        type: string
+        description: The status of the device
+      value:
+        type: string
+        description: The last telemetry value of the device sensor
+      unit:
+        type: string
+        description: The unit of the value
+  InputError:
+    type: object
+    properties:
+      details:
+        type: array
+        items:
+          type: object
+          properties:
+            field:
+              type: string
+              description: The invalid field name
+            error:
+              type: string
+              description: The error description
+            value:
+              type: string
+              description: The input value
