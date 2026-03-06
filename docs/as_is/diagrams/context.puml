@@ -1,0 +1,21 @@
+@startuml
+
+title Диаграмма контекста SmartHome
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+top to bottom direction
+
+Person(customer, "Customer", "Клиент системы Smart Home")
+Person(engineer, "Engineer", "Инженер настройки оборудования системы Smart Home")
+System(SmartHomeSystem, "SmartHome System", "Система управления умный дом")
+System(FacilityControlSystem, "Facility Control System", "Система управления оборудованием дома")
+System_Ext(CustomerRelManagement, "CRM", "Система управления клиентами")
+
+Rel_D(customer, SmartHomeSystem, "Управляет температурой дома")
+Rel_R(SmartHomeSystem, FacilityControlSystem, "Управляет оборудованием дома")
+Rel(engineer, SmartHomeSystem, "Заводит датчики в системе")
+Rel(engineer, FacilityControlSystem, "Устанавливает оборудование")
+Rel_R(engineer, CustomerRelManagement, "Заносит информацию о деталях установки оборудования зааказчику")
+
+@enduml

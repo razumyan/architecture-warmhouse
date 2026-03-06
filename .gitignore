@@ -192,3 +192,7 @@ build/
 
 tmp/
 task-*
+/site/
+
+.swagger-codegen
+.swagger-codegen-ignore

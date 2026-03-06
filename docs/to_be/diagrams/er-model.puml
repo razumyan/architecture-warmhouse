@@ -1,0 +1,56 @@
+@startuml
+title ER диаграмма моделей системы
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+entity Customer {
+  +customer_id: INT <<PK>>
+  +first_name: VARCHAR
+  +last_name: VARCHAR
+}
+
+entity Script {
+  +script_id: INT <<PK>>
+  +name: VARCHAR
+  +lang: VARCHAR
+  +customer_id: INT <<FK>>
+  +type: VARCHAR
+  +content: VARCHAR
+}
+
+entity ScriptParameter {
+  +script_parameter_id: INT <<PK>>
+  +script_id: INT <<FK>>
+  +name: VARCHAR
+  +type: VARCHAR
+  +value: VARCHAR
+}
+
+entity ScriptSchedule {
+ +script_id: INT <<PK>>
+ +cron: VARCHAR
+}
+
+entity Device {
+ +device_id: INT <<PK>>
+ +customer_id: INT <<FK>>
+ +name: VARCHAR
+ +location: VARCHAR
+ +status: VARCHAR
+ +type: VARCHAR
+ +is_sensor: BOOLEAN
+ +measurement_unit: VARCHAR
+ +value: FLOAT
+ +manufacture_id: VARCHAR <<unique>>
+ +created_at: TIMESTAMP
+ +updated_at: TIMESTAMP
+}
+
+Customer "customer_id" ||---o{ "customer_id" Script
+Customer "customer_id" ||---o{ "customer_id" Device
+Script "script_id" ||--o| "script_id" ScriptSchedule
+Script "script_id" ||--o{ "script_id" ScriptParameter
+
+@enduml

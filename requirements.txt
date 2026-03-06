@@ -1,0 +1,7 @@
+mkdocs-include-markdown-plugin==7.2.1
+mkdocs-swagger-ui-tag==0.8.0
+mkdocs-asyncapi-plugin==0.1.0
+mkdocs-asyncapi-tag-plugin==0.8.0
+plantuml-markdown==3.11.1
+mkdocs_puml==2.3.0
+mkdocs-plantuml==0.1.1
