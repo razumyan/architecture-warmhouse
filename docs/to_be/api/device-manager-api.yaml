@@ -8,7 +8,7 @@ defaultContentType: application/json
 
 channels:
   device.registration.confirmed:
-    description: The topic on which registreing device information values may be produced and consumed
+    description: The topic on which registering device information values may be produced and consumed
     publish:
       summary: Information about registered device
       operationId: receiveDeviceRegistrationConfirmation

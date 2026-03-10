@@ -25,7 +25,7 @@ jobs:
       - name: Install PlantUML
         run: |
            sudo apt-get install plantuml
-           wget 'https://release-assets.githubusercontent.com/github-production-release-asset/1051476/0666af75-ac54-4c7a-b43c-27d8a1668711?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-03-06T13%3A59%3A19Z&rscd=attachment%3B+filename%3Dplantuml-1.2026.2.jar&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-03-06T12%3A58%3A50Z&ske=2026-03-06T13%3A59%3A19Z&sks=b&skv=2018-11-09&sig=gqXHPqpjnF8T0rI9JU7uICwLYWsPHDM7Kkb6P3ZDQS8%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc3MjgwMzgxMiwibmJmIjoxNzcyODAyMDEyLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.RRNDtJd61720y24_wL4NT6NQAbO8B9xjWh_Mws1eJpY&response-content-disposition=attachment%3B%20filename%3Dplantuml-1.2026.2.jar&response-content-type=application%2Foctet-stream' -O plantuml.jar
+           wget 'https://repo1.maven.org/maven2/net/sourceforge/plantuml/plantuml/1.2026.2/plantuml-1.2026.2.jar' -O plantuml.jar
 
       - name: Install SwaggerGen
         run: wget 'https://repo1.maven.org/maven2/io/swagger/codegen/v3/swagger-codegen-cli/3.0.36/swagger-codegen-cli-3.0.36.jar' -O swagger-codegen-cli.jar

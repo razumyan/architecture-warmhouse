@@ -3,16 +3,30 @@ title Диаграмма контейнеров SmartHome
 
 !include https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
 
+AddContainerTag("meanTag", $borderColor="orange", $borderThickness="3")
+
 Person(customer, "Customer", "Клиент системы Smart Home")
 
 Container_Boundary(SmartHomeSystem, "SmartHome System") {
+  Container(GatewayAPI, "Gateway API", "Nginx", "Маршрутизирует внешние запросы", $tags="meanTag")
   Container(SmartHomeService, "Smart Home Service", "GoLang", "Обрабатывает и маршрутизирует запросы клиентов")
   Container(ScriptService, "Script Service", "GoLang", "Управляет сценариями\nВыполняет сценарии")
   Container(CustomerApp, "Customer WEB App", "ReactJS", "Позволяет клиенту управлять устройствами в доме")
   Container(CustomerDeviceManger, "Customer Device Manger", "GoLang", "Управляет подключением устройств")
   ContainerDb(DeviceDatabase, "Device DB", "PostgreSQL", "Хранит состояние устройств подключенных к системе")
   ContainerDb(ScriptDatabase, "Script DB", "PostgreSQL", "Хранит пользовательские сценарии поведения устройств")
+
+  Rel_D(CustomerApp, GatewayAPI, "HTTPS", "Запросы клиента")
+  Rel_L(GatewayAPI, SmartHomeService, "Управление устройствами клиента\nСоздание скриптов", "REST API")
+  Rel_D(GatewayAPI, CustomerDeviceManger, "Управление устройствами клиента\nСоздание скриптов", "MQTT")
+  Rel_D(CustomerDeviceManger, DeviceDatabase, "Запись/Чтение сотояния устройств", "SQL/TCP")
+  Rel_D(SmartHomeService, CustomerDeviceManger, "Команды устройствам", "gRPC")
+  Rel_D(SmartHomeService, ScriptService, "Управление сценариями", "gRPC")
+  Rel_D(ScriptService, ScriptDatabase, "Запись/Чтение сценариев", "SQL/TCP")
+  Rel_R(ScriptService, CustomerDeviceManger, "События изменения состояния устройств\nКоманды устройствам", "gRPC")
 }
+
+Rel_D(customer, CustomerApp, "Управление Домом\nРегистрация устройств")
 
 Container_Boundary(CustomerHome, "Customer Home") {
   Container_Ext(SmartHomeDevice, "Smart Home Device\n1,2...N", "Any Compatible", "Устройство поддерживающее протокол системы Smart Home")
@@ -20,16 +34,8 @@ Container_Boundary(CustomerHome, "Customer Home") {
 
 Container_Ext(CustomerPortal, "Customer Portal", "Liferay", "Система управления клиентами. Регистрация, авторизация, CRM")
 
-Rel_L(SmartHomeDevice, CustomerDeviceManger, "Телеметрия\nУправление устройствами", "MQTTs")
-
-Rel_D(customer, CustomerApp, "Управление Домом\nРегистрация устройств")
-Rel_D(CustomerApp, SmartHomeService, "Управление устройствами клиента\nСоздание скриптов", "REST API")
 Rel_R(CustomerApp, CustomerPortal, "OAuth2", "HTTPS")
 
-Rel_D(CustomerDeviceManger, DeviceDatabase, "Запись/Чтение сотояния устройств", "SQL/TCP")
-Rel_D(SmartHomeService, CustomerDeviceManger, "Команды устройствам", "gRPC")
-Rel_D(SmartHomeService, ScriptService, "Управление сценариями", "gRPC")
-Rel_D(ScriptService, ScriptDatabase, "Запись/Чтение сценариев", "SQL/TCP")
-Rel_R(ScriptService, CustomerDeviceManger, "События изменения состояния устройств\nКоманды устройствам", "gRPC")
+Rel_L(SmartHomeDevice, GatewayAPI, "Трафик управления устройсвами/телеметрия", "MQTTs")
 
 @enduml
