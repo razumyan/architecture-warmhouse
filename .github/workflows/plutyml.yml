@@ -1,0 +1,49 @@
+name: PlantUML Diagrams
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  generate-diagrams:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Install PlantUML
+        run: |
+           sudo apt-get install plantuml
+           wget 'https://repo1.maven.org/maven2/net/sourceforge/plantuml/plantuml/1.2026.2/plantuml-1.2026.2.jar' -O plantuml.jar
+
+      - name: Install SwaggerGen
+        run: wget 'https://repo1.maven.org/maven2/io/swagger/codegen/v3/swagger-codegen-cli/3.0.36/swagger-codegen-cli-3.0.36.jar' -O swagger-codegen-cli.jar
+
+      - name: Generate Diagrams
+        run: |
+          java -jar plantuml.jar docs/as_is/diagrams/*.puml
+          java -jar plantuml.jar docs/to_be/diagrams/*.puml
+          java -jar swagger-codegen-cli.jar generate -i ./docs/to_be/api/script-service-api.yaml -l html -o ./docs/to_be/api/script-service-api
+          java -jar swagger-codegen-cli.jar generate -i ./docs/to_be/api/smart-home-api.yaml -l html -o ./docs/to_be/api/smart-home-api
+
+      - name: Commit Diagrams
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/as_is/diagrams/*.png
+          git add docs/to_be/diagrams/*.png
+          git add docs/to_be/api/**/index.html
+          git commit -m "Automated diagram generation"
+          git push origin main
+        if: success()

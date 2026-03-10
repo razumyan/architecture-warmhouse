@@ -1,0 +1,150 @@
+asyncapi: 2.5.0
+info:
+  title: SmartHome - Customer Device Application
+  version: 1.0.0
+  description: This service manages customer devices
+
+defaultContentType: application/json
+
+channels:
+  device.registration.confirmed:
+    description: The topic on which registering device information values may be produced and consumed
+    publish:
+      summary: Information about registered device
+      operationId: receiveDeviceRegistrationConfirmation
+      message:
+        $ref: '#/components/messages/deviceRegistrationConfirmed'
+
+  device.{customerId}.{manufactureId}.telemtery.received:
+    description: The topic on which a device telemtry values may be produced and consumed
+    parameters:
+      customerId:
+        $ref: '#/components/parameters/customerId'
+      manufactureId:
+        $ref: '#/components/parameters/manufactureId'
+    publish:
+      summary: Information about registered device
+      operationId: receiveDeviceTelemetry
+      message:
+        $ref: '#/components/messages/deviceTelemetryReceived'
+
+  device.{customerId}.{manufactureId}.status.changed:
+    description: The topic on which a device status may be produced and consumed
+    parameters:
+      customerId:
+        $ref: '#/components/parameters/customerId'
+      manufactureId:
+        $ref: '#/components/parameters/manufactureId'
+    publish:
+      summary: Information about registered device
+      operationId: deviceStatusChanged
+      message:
+        $ref: '#/components/messages/deviceStatusChanged'
+
+  device.{customerId}.{manufactureId}.command:
+    description: The topic on which a device command may be produced and consumed
+    parameters:
+      customerId:
+        $ref: '#/components/parameters/customerId'
+      manufactureId:
+        $ref: '#/components/parameters/manufactureId'
+    publish:
+      summary: Information about registered device
+      operationId: deviceCommand
+      message:
+        $ref: '#/components/messages/deviceCommandReceived'
+
+components:
+  parameters:
+    customerId:
+      description: The ID of the customer who owns the device.
+    manufactureId:
+      description: The uniquer ID of the customer's device.
+  messages:
+    deviceRegistrationConfirmed:
+      summary: Information about registered device
+      payload:
+        $ref: "#/components/schemas/DeviceRegistrationConfirmed"
+    deviceTelemetryReceived:
+      summary: Information about the device telemetry
+      payload:
+        $ref: "#/components/schemas/DeviceTelemetryReceived"
+    deviceStatusChanged:
+      summary: Information about the device status
+      payload:
+        $ref: "#/components/schemas/DeviceStatusChanged"
+    deviceCommandReceived:
+      summary: Information about the device command
+      payload:
+        $ref: "#/components/schemas/DeviceCommandReceived"
+  schemas:
+    DeviceRegistrationConfirmed:
+      type: object
+      properties:
+        confirmationCode:
+          type: string
+          description: The unique code of the device confirmation
+        name:
+          type: string
+          description: The device name
+        location:
+          type: string
+          description: The device location
+        type:
+          type: string
+          description: The device type
+        isSensor:
+          type: boolean
+          description: Is able to produce a telemetry data
+        manufactureId:
+          type: string
+          description: The unique device identifier
+    DeviceTelemetryReceived:
+      type: object
+      properties:
+        timestamp:
+          type: number
+          description: The timestamp of telemetry value in mills (UTC)
+        value:
+          type: number
+          description: The value of the device's telemetry
+    DeviceStatusChanged:
+      type: object
+      properties:
+        timestamp:
+          type: number
+          description: The timestamp of status change event in mills (UTC)
+        status:
+          type: string
+          description: The new device's type specific status
+    DeviceCommandReceived:
+      type: object
+      properties:
+        deviceId:
+          type: number
+          description: The SmartHome identifier of the device
+        command:
+          type: string
+          description: The device specific command
+        parameters:
+          type: array
+          items:
+            oneOf:
+              - type: object
+                description: The numeric parameter of the command
+                properties:
+                  name:
+                    type: string
+                    description: The name of the command parameter
+                  value:
+                    type: number
+                    description: The numeric value of the parameter
+              - type: object
+                description: The string parameter of the command
+                properties:
+                  name:
+                    type: string
+                    description: The name of the command parameter
+                  value:
+                    type: string
+                    description: The string value of the parameter

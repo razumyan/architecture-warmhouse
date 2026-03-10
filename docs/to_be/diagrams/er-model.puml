@@ -1,0 +1,89 @@
+@startuml
+title ER диаграмма моделей системы
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+entity Customer {
+  +customer_id: INT <<PK>>
+  +first_name: VARCHAR
+  +last_name: VARCHAR
+}
+
+entity CustomerLocation {
+ +customer_location_id INT <<PK>>
+ +customer_id: INT <<FK>>
+ +parent_id: INT <<FK>>
+ +type: VARCHAR
+ +name: VARCHAR
+ +description: VARCHAR
+}
+
+entity Device {
+ +device_id: INT <<PK>>
+ +customer_id: INT <<FK>>
+ +customer_location_id: INT <<FK>>
+ +name: VARCHAR
+ +status: VARCHAR
+ +type: VARCHAR
+ +is_sensor: BOOLEAN
+ +measurement_unit: VARCHAR
+ +manufacture_id: VARCHAR <<unique>>
+ +created_at: TIMESTAMP
+ +updated_at: TIMESTAMP
+}
+
+entity Telemetry {
+ +device_id: INT <<PK>>,<<FK>>
+ +measured_at: TIMESTAMP <<PK>>
+ +value: FLOAT
+}
+
+entity DeviceGroup {
+ +device_group_id INT <<PK>>
+ +customer_id: INT <<FK>>
+ +name: VARCHAR
+}
+
+entity DeviceGroupMember {
+ +device_group_member_id INT <<PK>>
+ +device_group_id INT <<FK>>
+ +device_id INT <<FK>>
+}
+
+entity Script {
+  +script_id: INT <<PK>>
+  +name: VARCHAR
+  +lang: VARCHAR
+  +customer_id: INT <<FK>>
+  +type: VARCHAR
+  +content: VARCHAR
+}
+
+entity ScriptParameter {
+  +script_parameter_id: INT <<PK>>
+  +script_id: INT <<FK>>
+  +name: VARCHAR
+  +type: VARCHAR
+  +value: VARCHAR
+}
+
+entity ScriptSchedule {
+ +script_id: INT <<PK>>
+ +cron: VARCHAR
+}
+
+Customer "customer_id" ||---o{ "customer_id" Script
+Customer "customer_id" ||--o{ "customer_id" Device
+Customer "customer_id" ||----o{ "customer_id" DeviceGroup
+Customer "customer_id" ||---o{ "customer_id" CustomerLocation
+Script "script_id" ||--o| "script_id" ScriptSchedule
+Script "script_id" ||--o{ "script_id" ScriptParameter
+Device "device_id" ||--o{ "device_id" Telemetry
+Device "device_id" ||--|{ "device_id" DeviceGroupMember
+DeviceGroup "device_group_id" ||--|{ "device_group_id" DeviceGroupMember
+CustomerLocation "customer_location_id" ||--o{ "customer_location_id" Device
+CustomerLocation "customer_location_id" }o--|| "parent_id" CustomerLocation
+
+@enduml

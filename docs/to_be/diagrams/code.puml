@@ -1,0 +1,37 @@
+@startuml
+title Диаграмма кода по управлению сценариями
+
+left to right direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+class Customer {
+  +Long id
+  +String firstName
+  +String lastName
+}
+
+class Script {
+  +Long id
+  +String name
+  +ScriptLang lang
+  +Customer owner
+  +ExecutionType type
+  +List<ScriptParameter> parameters
+  +void add()
+  +void execute()
+  +void remove()
+}
+
+class ScriptSchedule {
+ +Long id
+ +Script targetScript
+ +String cron
+ +void trigger()
+}
+
+
+Customer "1" -- "0--*" Script : owns
+ScriptSchedule "0-1" -- "1" Script : has
+
+@enduml

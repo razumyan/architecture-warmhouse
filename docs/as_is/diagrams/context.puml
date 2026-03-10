@@ -1,0 +1,22 @@
+@startuml
+
+title Диаграмма контекста SmartHome
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+top to bottom direction
+
+Person(customer, "Customer", "Клиент системы Smart Home")
+Person(engineer, "Engineer", "Инженер настройки оборудования системы Smart Home")
+System(SmartHomeSystem, "SmartHome System", "Система управления умный дом")
+System(TemperatureMeasurementSystem, "Temperature Measurement System", "Система снятия температуры")
+System_Ext(TemperatureSensor, "Temperature Sensor", "Датчики температуры")
+
+Rel_D(customer, SmartHomeSystem, "Запрашивает значения тумпературы помещения")
+Rel_R(SmartHomeSystem, TemperatureMeasurementSystem, "Запрашивает значения тумпературы датчиков")
+Rel(engineer, SmartHomeSystem, "Заводит датчики в системе")
+Rel(engineer, TemperatureMeasurementSystem, "Настраивает оборудование")
+Rel_D(engineer, TemperatureSensor, "Устанавливает оборудование")
+Rel_R(TemperatureMeasurementSystem, TemperatureSensor, "Считывает значение с датчика")
+
+@enduml
